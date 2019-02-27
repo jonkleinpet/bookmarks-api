@@ -6,7 +6,7 @@ const morgan = require('morgan');
 const cors = require('cors');
 const helmet = require('helmet');
 const { NODE_ENV } = require('./config');
-const bookmarksRouter = require('./bookmarks/bookmarks-router');
+const bookmarksRouter = require('./bookmarks/BookmarksRouter');
 
 const app = express();
 
@@ -27,10 +27,11 @@ app.use(function errorHandler(error, req, res, next) {
     response = { message: error.message, error };
   }
   res.status(500).json(response);
+  next();
 });
 
 app.use(function validateBearerToken(req, res, next) {
-  const apiToken = process.env.API_TOKEN;
+  const apiToken = process.env.API_KEY;
   const authToken = req.get('Authorization');
 
   if (!authToken || authToken.split(' ')[1] !== apiToken) {
@@ -39,12 +40,6 @@ app.use(function validateBearerToken(req, res, next) {
   next();
 });
 
-app.use('/bookmarks' ,bookmarksRouter);
-
-app.get('/', (req, res) => {
-  res.send('Hello, world!');
-});
-
-
+app.use('/bookmarks', bookmarksRouter);
 
 module.exports = app;
