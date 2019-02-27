@@ -5,16 +5,26 @@ const bookmarksRouter = express.Router();
 const logger = require('../logger');
 const BookmarksService = require('./BookmarksService');
 const bodyParser = express.json();
-const knex = require('knex');
 const uuid = require('uuid/v4');
 
 bookmarksRouter
   .route('/')
   .get((req, res, next) => {
     const knexInstance = req.app.get('db');
-    
     BookmarksService.getAllBookmarks(knexInstance)
-      .then(bookmarks => console.log(bookmarks))
+      .then(bookmarks => {
+        res.json(bookmarks);
+      })
+      .catch(next);
+  });
+
+bookmarksRouter
+  .route('/:id')
+  .get((req, res, next) => {
+    BookmarksService.getById(req.app.get('db'), req.params.id)
+      .then(bookmark => {
+        res.json(bookmark);
+      })
       .catch(next);
   });
 
